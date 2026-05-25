@@ -105,7 +105,7 @@ describe('MoviesResource.listQuotes()', () => {
     pages: 1,
   };
 
-  it('calls http.get with the correct path', async () => {
+  it('calls /movie/{id}/quote when no filters are given', async () => {
     const http = makeHttp(RAW_QUOTES);
     const resource = new MoviesResource(http as HttpClient);
     await resource.listQuotes(MOVIE._id);
@@ -118,13 +118,20 @@ describe('MoviesResource.listQuotes()', () => {
     expect(result.items).toEqual(RAW_QUOTES.docs);
   });
 
-  it('passes filter params through to http.get', async () => {
+  it('calls /movie/{id}/quote when only pagination params are given', async () => {
+    const http = makeHttp(RAW_QUOTES);
+    const resource = new MoviesResource(http as HttpClient);
+    await resource.listQuotes(MOVIE._id, { limit: 5, page: 2 });
+    expect(http.get).toHaveBeenCalledWith(`/movie/${MOVIE._id}/quote`, { limit: 5, page: 2 });
+  });
+
+  it('calls /quote with movie id injected when filters are given', async () => {
     const http = makeHttp(RAW_QUOTES);
     const resource = new MoviesResource(http as HttpClient);
     await resource.listQuotes(MOVIE._id, { dialog: { regex: '/fool/i' } });
     expect(http.get).toHaveBeenCalledWith(
-      `/movie/${MOVIE._id}/quote`,
-      { dialog: { regex: '/fool/i' } },
+      '/quote',
+      { dialog: { regex: '/fool/i' }, movie: MOVIE._id },
     );
   });
 });

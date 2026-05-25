@@ -28,7 +28,10 @@ export class MoviesResource {
   }
 
   async listQuotes(id: string, params: ListMovieQuotesParams = {}): Promise<PaginatedResponse<Quote>> {
-    const raw = await this.http.get<RawListResponse<Quote>>(`/movie/${id}/quote`, params);
+    const hasFilters = params.character !== undefined || params.dialog !== undefined;
+    const raw = hasFilters
+      ? await this.http.get<RawListResponse<Quote>>('/quote', { ...params, movie: id })
+      : await this.http.get<RawListResponse<Quote>>(`/movie/${id}/quote`, params);
     return buildPaginatedResponse(raw, params, (p) => this.listQuotes(id, p));
   }
 }
