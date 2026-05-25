@@ -84,8 +84,8 @@ async function run(): Promise<void> {
 
   await test('fetches a quote by ID and fields match', async () => {
     assert(sampleQuote !== null, 'skipped — sample quote not available');
-    const quote = await client.quotes.get(sampleQuote!._id);
-    assert(quote._id === sampleQuote!._id, `expected _id "${sampleQuote!._id}", got "${quote._id}"`);
+    const quote = await client.quotes.get(sampleQuote!.id);
+    assert(quote.id === sampleQuote!.id, `expected id "${sampleQuote!.id}", got "${quote.id}"`);
     assert(quote.dialog === sampleQuote!.dialog, `expected dialog "${sampleQuote!.dialog}", got "${quote.dialog}"`);
     assert(typeof quote.movie === 'string' && quote.movie.length > 0, 'expected movie to be a non-empty string ID');
     assert(typeof quote.character === 'string' && quote.character.length > 0, 'expected character to be a non-empty string ID');

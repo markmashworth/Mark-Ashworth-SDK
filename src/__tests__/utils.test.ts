@@ -105,7 +105,7 @@ describe('serializeFilterParam', () => {
 
 describe('buildPaginatedResponse', () => {
   const rawPage1 = {
-    docs: [{ _id: '1', name: 'Movie A' }, { _id: '2', name: 'Movie B' }],
+    docs: [{ id: '1', name: 'Movie A' }, { id: '2', name: 'Movie B' }],
     total: 10,
     limit: 2,
     offset: 0,

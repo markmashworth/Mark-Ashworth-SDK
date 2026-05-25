@@ -16,7 +16,7 @@ export interface TheOneApiClientOptions {
 }
 
 export interface Movie {
-  _id: string;
+  id: string;
   name: string;
   runtimeInMinutes: number;
   budgetInMillions: number;
@@ -27,7 +27,6 @@ export interface Movie {
 }
 
 export interface Quote {
-  _id: string;
   id: string;
   dialog: string;
   movie: string;

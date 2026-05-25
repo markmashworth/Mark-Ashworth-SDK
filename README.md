@@ -16,6 +16,14 @@ npm install the-one-api-sdk
 
 All requests require a Bearer token. Register at [the-one-api.dev](https://the-one-api.dev) to obtain one.
 
+## Demo
+
+Run the included demo script to see the SDK in action — movies, quotes, filtering, pagination, and error handling:
+
+```bash
+npx tsx demo.ts <your-token>
+```
+
 ## A note on sorting and filtering
 
 The API docs say that sorting should work and gives this request as an example:`/quote?sort=character:desc`. However, this does not work when I try it (although it's fine without the `sort` parameter).
@@ -122,7 +130,7 @@ Fetch a single quote by ID. Throws `NotFoundError` if the ID does not exist.
 
 ```ts
 const quote = await client.quotes.get('5cd96e05de30eff6ebcce7e9');
-// { _id: '...', id: '...', dialog: 'Deagol!', movie: '...', character: '...' }
+// { id: '...', dialog: 'Deagol!', movie: '...', character: '...' }
 ```
 
 ### `client.quotes.list(params?)`

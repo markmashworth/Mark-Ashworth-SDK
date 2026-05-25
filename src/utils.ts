@@ -1,5 +1,12 @@
 import type { PaginatedResponse } from './types';
 
+export type WithRawId<T> = Omit<T, 'id'> & { _id: string };
+
+export function mapId<T extends { _id: string }>(raw: T): Omit<T, '_id'> & { id: string } {
+  const { _id, ...rest } = raw;
+  return { id: _id, ...rest } as Omit<T, '_id'> & { id: string };
+}
+
 /**
  * Serializes a single filter field into URLSearchParams using the API's
  * operator encoding convention:

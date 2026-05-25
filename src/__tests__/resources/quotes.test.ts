@@ -2,21 +2,30 @@ import { describe, it, expect, vi } from 'vitest';
 import { QuotesResource } from '../../resources/quotes';
 import { NotFoundError } from '../../errors';
 import type { HttpClient } from '../../http';
+import type { Quote } from '../../types';
 
 function makeHttp(response: unknown): Pick<HttpClient, 'get'> {
   return { get: vi.fn().mockResolvedValue(response) };
 }
 
-const QUOTE = {
-  _id: '5cd96e05de30eff6ebcce7e9',
-  id: '5cd96e05de30eff6ebcce7e9',
+const QUOTE_ID = '5cd96e05de30eff6ebcce7e9';
+
+const RAW_QUOTE = {
+  _id: QUOTE_ID,
+  dialog: 'Deagol!',
+  movie: '5cd95395de30eff6ebccde5b',
+  character: '5cd99d4bde30eff6ebccfe9e',
+};
+
+const QUOTE: Quote = {
+  id: QUOTE_ID,
   dialog: 'Deagol!',
   movie: '5cd95395de30eff6ebccde5b',
   character: '5cd99d4bde30eff6ebccfe9e',
 };
 
 const RAW_LIST = {
-  docs: [QUOTE],
+  docs: [RAW_QUOTE],
   total: 1,
   limit: 10,
   offset: 0,
@@ -28,16 +37,16 @@ const RAW_LIST = {
 
 describe('QuotesResource.get()', () => {
   it('returns the first doc from the response', async () => {
-    const resource = new QuotesResource(makeHttp({ docs: [QUOTE] }) as HttpClient);
-    const quote = await resource.get(QUOTE._id);
+    const resource = new QuotesResource(makeHttp({ docs: [RAW_QUOTE] }) as HttpClient);
+    const quote = await resource.get(QUOTE_ID);
     expect(quote).toEqual(QUOTE);
   });
 
   it('calls http.get with the correct path', async () => {
-    const http = makeHttp({ docs: [QUOTE] });
+    const http = makeHttp({ docs: [RAW_QUOTE] });
     const resource = new QuotesResource(http as HttpClient);
-    await resource.get(QUOTE._id);
-    expect(http.get).toHaveBeenCalledWith(`/quote/${QUOTE._id}`);
+    await resource.get(QUOTE_ID);
+    expect(http.get).toHaveBeenCalledWith(`/quote/${QUOTE_ID}`);
   });
 
   it('throws NotFoundError when docs is empty', async () => {

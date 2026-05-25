@@ -2,13 +2,27 @@ import { describe, it, expect, vi } from 'vitest';
 import { MoviesResource } from '../../resources/movies';
 import { NotFoundError } from '../../errors';
 import type { HttpClient } from '../../http';
+import type { Movie } from '../../types';
 
 function makeHttp(response: unknown): Pick<HttpClient, 'get'> {
   return { get: vi.fn().mockResolvedValue(response) };
 }
 
-const MOVIE = {
-  _id: '5cd95395de30eff6ebccde5c',
+const MOVIE_ID = '5cd95395de30eff6ebccde5c';
+
+const RAW_MOVIE = {
+  _id: MOVIE_ID,
+  name: 'The Fellowship of the Ring',
+  runtimeInMinutes: 178,
+  budgetInMillions: 93,
+  boxOfficeRevenueInMillions: 871.5,
+  academyAwardNominations: 13,
+  academyAwardWins: 4,
+  rottenTomatoesScore: 91,
+};
+
+const MOVIE: Movie = {
+  id: MOVIE_ID,
   name: 'The Fellowship of the Ring',
   runtimeInMinutes: 178,
   budgetInMillions: 93,
@@ -19,7 +33,7 @@ const MOVIE = {
 };
 
 const RAW_LIST = {
-  docs: [MOVIE],
+  docs: [RAW_MOVIE],
   total: 1,
   limit: 10,
   offset: 0,
@@ -31,16 +45,16 @@ const RAW_LIST = {
 
 describe('MoviesResource.get()', () => {
   it('returns the first doc from the response', async () => {
-    const resource = new MoviesResource(makeHttp({ docs: [MOVIE] }) as HttpClient);
-    const movie = await resource.get(MOVIE._id);
+    const resource = new MoviesResource(makeHttp({ docs: [RAW_MOVIE] }) as HttpClient);
+    const movie = await resource.get(MOVIE_ID);
     expect(movie).toEqual(MOVIE);
   });
 
   it('calls http.get with the correct path', async () => {
-    const http = makeHttp({ docs: [MOVIE] });
+    const http = makeHttp({ docs: [RAW_MOVIE] });
     const resource = new MoviesResource(http as HttpClient);
-    await resource.get(MOVIE._id);
-    expect(http.get).toHaveBeenCalledWith(`/movie/${MOVIE._id}`);
+    await resource.get(MOVIE_ID);
+    expect(http.get).toHaveBeenCalledWith(`/movie/${MOVIE_ID}`);
   });
 
   it('throws NotFoundError when docs is empty', async () => {
@@ -97,7 +111,7 @@ describe('MoviesResource.list()', () => {
 
 describe('MoviesResource.listQuotes()', () => {
   const RAW_QUOTES = {
-    docs: [{ _id: 'q1', dialog: 'You shall not pass!', movie: MOVIE._id, character: 'c1', id: 'q1' }],
+    docs: [{ _id: 'q1', dialog: 'You shall not pass!', movie: MOVIE_ID, character: 'c1' }],
     total: 1,
     limit: 10,
     offset: 0,
@@ -105,33 +119,35 @@ describe('MoviesResource.listQuotes()', () => {
     pages: 1,
   };
 
+  const MAPPED_QUOTES = [{ id: 'q1', dialog: 'You shall not pass!', movie: MOVIE_ID, character: 'c1' }];
+
   it('calls /movie/{id}/quote when no filters are given', async () => {
     const http = makeHttp(RAW_QUOTES);
     const resource = new MoviesResource(http as HttpClient);
-    await resource.listQuotes(MOVIE._id);
-    expect(http.get).toHaveBeenCalledWith(`/movie/${MOVIE._id}/quote`, {});
+    await resource.listQuotes(MOVIE_ID);
+    expect(http.get).toHaveBeenCalledWith(`/movie/${MOVIE_ID}/quote`, {});
   });
 
-  it('returns items mapped from docs', async () => {
+  it('returns items with id mapped from _id', async () => {
     const resource = new MoviesResource(makeHttp(RAW_QUOTES) as HttpClient);
-    const result = await resource.listQuotes(MOVIE._id);
-    expect(result.items).toEqual(RAW_QUOTES.docs);
+    const result = await resource.listQuotes(MOVIE_ID);
+    expect(result.items).toEqual(MAPPED_QUOTES);
   });
 
   it('calls /movie/{id}/quote when only pagination params are given', async () => {
     const http = makeHttp(RAW_QUOTES);
     const resource = new MoviesResource(http as HttpClient);
-    await resource.listQuotes(MOVIE._id, { limit: 5, page: 2 });
-    expect(http.get).toHaveBeenCalledWith(`/movie/${MOVIE._id}/quote`, { limit: 5, page: 2 });
+    await resource.listQuotes(MOVIE_ID, { limit: 5, page: 2 });
+    expect(http.get).toHaveBeenCalledWith(`/movie/${MOVIE_ID}/quote`, { limit: 5, page: 2 });
   });
 
   it('calls /quote with movie id injected when filters are given', async () => {
     const http = makeHttp(RAW_QUOTES);
     const resource = new MoviesResource(http as HttpClient);
-    await resource.listQuotes(MOVIE._id, { dialog: { regex: '/fool/i' } });
+    await resource.listQuotes(MOVIE_ID, { dialog: { regex: '/fool/i' } });
     expect(http.get).toHaveBeenCalledWith(
       '/quote',
-      { dialog: { regex: '/fool/i' }, movie: MOVIE._id },
+      { dialog: { regex: '/fool/i' }, movie: MOVIE_ID },
     );
   });
 });

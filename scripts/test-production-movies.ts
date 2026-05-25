@@ -72,7 +72,7 @@ async function run(): Promise<void> {
 
   await test('fetches a known movie by ID', async () => {
     const movie = await client.movies.get(FELLOWSHIP_ID);
-    assert(movie._id === FELLOWSHIP_ID, `expected _id "${FELLOWSHIP_ID}", got "${movie._id}"`);
+    assert(movie.id === FELLOWSHIP_ID, `expected id "${FELLOWSHIP_ID}", got "${movie.id}"`);
     assert(movie.name === 'The Fellowship of the Ring', `expected name "The Fellowship of the Ring", got "${movie.name}"`);
     assert(movie.runtimeInMinutes === 178, `expected runtimeInMinutes 178, got ${movie.runtimeInMinutes}`);
     assert(movie.academyAwardWins === 4, `expected academyAwardWins 4, got ${movie.academyAwardWins}`);
@@ -105,7 +105,7 @@ async function run(): Promise<void> {
     });
     const movie = await customClient.movies.get(FELLOWSHIP_ID);
     assert(callCount === 1, `expected custom fetch to be called once, got ${callCount}`);
-    assert(movie._id === FELLOWSHIP_ID, `expected _id "${FELLOWSHIP_ID}", got "${movie._id}"`);
+    assert(movie.id === FELLOWSHIP_ID, `expected id "${FELLOWSHIP_ID}", got "${movie.id}"`);
   });
 
   // ── movies.list() — no filters ───────────────────────────────────────────────
