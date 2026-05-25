@@ -1,0 +1,39 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm test
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run movie endpoint tests
+        run: npm run test:prod:movies -- ${{ secrets.THE_ONE_API_KEY }}
+
+      - name: Run quote endpoint tests
+        run: npm run test:prod:quotes -- ${{ secrets.THE_ONE_API_KEY }}
